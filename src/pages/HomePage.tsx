@@ -1,23 +1,38 @@
-import { FcGoogle } from "react-icons/fc";
-
 function HomePage() {
   return (
-    <div className="w-full flex-col items-center justify-center h-[94vh] text-gray-800 bg-black  relative bg-[url('/img/bn_home.png')] bg-image bg-cover bg-bottom">
+    <div className="w-full h-[94vh] flex-col items-center justify-center">
       <img
         src="/logo/logo.svg"
-        alt="Logo"
-        className="w-35 pt-1 items-center justify-center mx-auto absolute top-20 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        alt="logo"
+        className="w-20 absolute top-0 left-2"
       />
+      <div className="bg-[url('/img/bn_home_2.png')] bg-cover bg-center w-full h-1/3 flex rounded-b-4xl justify-between shadow">
+        <div className="flex flex-col  items-center justify-end h-full pb-5">
+          <h1 className="text-2xl text-baseline font-bold text-bold mt-1  w-full ml-10  text-white">
+            Olá, Marcos
+          </h1>
+          <p className="text-gray-300 text-baseline w-full ml-10">
+            Bora treinar hoje?
+          </p>
+        </div>
 
-      <div className="bg-blue-600 rounded-t-xl absolute bottom-0 w-full h-1/3 flex-col text-cyan-50 items-center justify-center flex">
-        <h1 className="text-xl text-center text-bold mt-1 w-80">
-          Venha fazer parte do time dos campeões!
-        </h1>
+        <div className="flex items-end justify-end h-full">
+          <button className="bg-blue-500 cursor-pointer h-10 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full m-6">
+            Bora!
+          </button>
+        </div>
+      </div>
 
-        <button className="bg-cyan-50 text-black px-4 flex py-2 rounded-4xl mt-8 cursor-pointer hover:bg-cyan-100 transition duration-300 mx-auto justify-center items-center gap-2.5">
-          <FcGoogle />
-          Fazer login com Google
-        </button>
+      <div className="">
+        <div className="flex justify-between items-center mx-5">
+          <h2 className="text-xl font-bold text-gray-800 mt-4 mb-5">
+            Concistência
+          </h2>
+
+          <a href="#" className="text-blue-500 hover:text-blue-700">
+            ver histórico
+          </a>
+        </div>
       </div>
     </div>
   );

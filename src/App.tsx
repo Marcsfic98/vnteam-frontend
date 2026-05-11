@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/navbar/Navbar";
 import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
@@ -9,7 +10,8 @@ function App() {
       <BrowserRouter>
         <div className="w-full h-full text-gray-800 flex-col items-center justify-center">
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/home" element={<HomePage />} />
           </Routes>
         </div>
         <Navbar />
