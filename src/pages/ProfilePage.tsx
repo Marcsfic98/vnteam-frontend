@@ -1,10 +1,16 @@
+import { useContext } from "react";
 import { IoExitOutline } from "react-icons/io5";
 import { LiaRulerSolid } from "react-icons/lia";
 import { LuBicepsFlexed } from "react-icons/lu";
 import { RiWeightLine } from "react-icons/ri";
 import { TbUser } from "react-icons/tb";
+import { AuthContext } from "../contexts/AuthContext";
 
 function ProfilePage() {
+  const { user } = useContext(AuthContext);
+
+  console.log(user);
+
   return (
     <div className="relative flex flex-col h-full w-full">
       <img
@@ -14,13 +20,22 @@ function ProfilePage() {
       />
 
       <div className="flex flex-col justify-center items-center mt-15">
-        <img
-          src="/img/bn_home.png"
-          alt="foto do usuario"
-          className="h-32 w-32 rounded-full object-cover object-center "
-        />
+        {user?.image ? (
+          <img
+            src={user.image}
+            alt={`Foto de ${user.name}`}
+            className="h-32 w-32 rounded-full object-cover object-center border-2 border-blue-500 shadow-md"
+          />
+        ) : (
+          <div className="h-32 w-32 rounded-full bg-gray-700 flex items-center justify-center">
+            {/* Ícone ou Inicial do nome caso não tenha imagem */}
+            <span className="text-white text-2xl font-bold">
+              {user?.name?.charAt(0)}
+            </span>
+          </div>
+        )}
 
-        <h2 className="font-bold text-black">Marcos Alexandre</h2>
+        <h2 className="font-bold text-black">{user?.name}</h2>
         <p>Plano Anual</p>
       </div>
 
