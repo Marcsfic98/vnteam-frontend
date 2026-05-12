@@ -1,3 +1,7 @@
+import BoxTraining from "../components/BoxTraining";
+import ConstancyBar from "../components/ConstancyBar";
+import Sequence from "../components/Sequence";
+
 function HomePage() {
   return (
     <div className="w-full h-[94vh] flex-col items-center justify-center">
@@ -33,6 +37,27 @@ function HomePage() {
             ver histórico
           </a>
         </div>
+
+        <div className="flex items-center justify-between mx-5 gap-2">
+          <ConstancyBar />
+          <Sequence />
+        </div>
+      </div>
+
+      <div className="">
+        <div className="flex justify-between items-center mx-5">
+          <h2 className="text-xl font-bold text-gray-800 mt-4 mb-5">
+            Treino de hoje
+          </h2>
+
+          <a href="#" className="text-blue-500 hover:text-blue-700">
+            ver treinos
+          </a>
+        </div>
+      </div>
+
+      <div className="flex justify-center items-center mx-5">
+        <BoxTraining />
       </div>
     </div>
   );
