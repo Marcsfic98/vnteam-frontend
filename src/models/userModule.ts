@@ -1,4 +1,5 @@
-import type WorkoutPlan from "./WorkoutPlanModule";
+import type { WorkoutPlan } from "./WorkoutPlanModule";
+
 
 export default interface User {
   id: number;

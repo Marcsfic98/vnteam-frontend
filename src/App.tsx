@@ -21,7 +21,7 @@ function App() {
               <Route path="/home" element={<HomePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/training_plan" element={<TrainingPlanPage />} />
-              <Route path="/training_day" element={<TrainingDayPage />} />
+              <Route path="/training_day/:id" element={<TrainingDayPage />} />
               <Route path="/callback" element={<AuthCallback />} />
             </Routes>
           </div>

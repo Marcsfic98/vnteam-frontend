@@ -1,7 +1,39 @@
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import BoxTraining from "../components/BoxTraining";
-import Rest from "../components/Rest";
+import { AuthContext } from "../contexts/AuthContext";
+import type { WorkoutPlan } from "../models/WorkoutPlanModule";
+import { search } from "../services/userService";
 
 function TrainingPlanPage() {
+  const { user } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [plan, SetPlan] = useState<WorkoutPlan | null>(null);
+
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+
+  const navigate = useNavigate();
+
+  const currentPlan = user?.workoutPlans?.[0];
+
+  useEffect(() => {
+    async function lookTraining() {
+      try {
+        setIsLoading(true);
+        await search(`/workout_plan/${currentPlan?.id}`, SetPlan, {
+          headers: { Authorization: token },
+        });
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setIsLoading(false);
+        console.log(plan);
+      }
+    }
+    lookTraining();
+  }, [token, currentPlan]);
+
   return (
     <div className="w-full h-[94vh] flex-col items-center justify-center">
       <img
@@ -13,7 +45,7 @@ function TrainingPlanPage() {
         <div className="flex flex-col  items-center justify-end h-full pb-5">
           <div className="flex items-end justify-end h-full">
             <button className="bg-blue-500 cursor-pointer h-6  hover:bg-blue-700 text-white  rounded-full  flex px-4">
-              Hipertrofia & Força
+              {currentPlan?.name}
             </button>
           </div>
 
@@ -23,33 +55,20 @@ function TrainingPlanPage() {
         </div>
       </div>
 
-      <div className="flex justify-center items-center my-5 mx-5">
-        <BoxTraining />
-      </div>
-
-      <div className="flex justify-center items-center my-5 mx-5">
-        <BoxTraining />
-      </div>
-
-      <div className="flex justify-center items-center my-5 mx-5">
-        <Rest />
-      </div>
-
-      <div className="flex justify-center items-center my-5 mx-5">
-        <BoxTraining />
-      </div>
-
-      <div className="flex justify-center items-center my-5 mx-5">
-        <BoxTraining />
-      </div>
-
-      <div className="flex justify-center items-center my-5 mx-5">
-        <Rest />
-      </div>
-
-      <div className="flex justify-center items-center my-5 mx-5">
-        <Rest />
-      </div>
+      {plan?.workoutDays?.map((day) => (
+        <div
+          key={day.id}
+          className="flex justify-center items-center my-5 mx-5"
+          onClick={() => navigate(`/training_day/${day.id}`)}
+        >
+          <BoxTraining
+            name={day.name}
+            estimatedDuration={day.estimatedDuration}
+            weekDay={day.weekDay}
+            quantity={day?.WorkoutExercice?.length}
+          />
+        </div>
+      ))}
     </div>
   );
 }

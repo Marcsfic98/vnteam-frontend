@@ -23,7 +23,7 @@ export interface WorkoutDay {
   estimatedDuration: number;
   workoutPlanId?: number;
   workoutPlan?: WorkoutPlan; 
-  workoutExercice?: WorkoutExercice[]; 
+  WorkoutExercice?: WorkoutExercice[]; 
   userWorkoutSessions?: any[];
 }
 
