@@ -35,13 +35,13 @@ function TrainingPlanPage() {
   }, [token, currentPlan]);
 
   return (
-    <div className="w-full h-[94vh] flex-col items-center justify-center">
+    <div className="w-full h-full flex-col items-center justify-center mb-20">
       <img
         src="/logo/logo.svg"
         alt="logo"
         className="w-20 absolute top-0 left-2"
       />
-      <div className="bg-[url('/img/treino.png')] bg-cover bg-center w-full h-1/3 flex rounded-b-4xl justify-between shadow">
+      <div className="bg-[url('/img/treino.png')] bg-cover bg-center w-full h-[30vh] flex rounded-b-4xl justify-between shadow">
         <div className="flex flex-col  items-center justify-end h-full pb-5">
           <div className="flex items-end justify-end h-full">
             <button className="bg-blue-500 cursor-pointer h-6  hover:bg-blue-700 text-white  rounded-full  flex px-4">
