@@ -4,6 +4,7 @@ import Navbar from "./components/navbar/Navbar";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import AuthCallback from "./pages/AuthCallback";
+import DietPage from "./pages/DietPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -23,6 +24,7 @@ function App() {
               <Route path="/training_plan" element={<TrainingPlanPage />} />
               <Route path="/training_day/:id" element={<TrainingDayPage />} />
               <Route path="/callback" element={<AuthCallback />} />
+              <Route path="/diet" element={<DietPage />} />
             </Routes>
           </div>
           <Navbar />
