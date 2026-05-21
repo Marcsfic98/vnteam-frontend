@@ -14,7 +14,7 @@ function Navbar() {
           <TbHome className="inline-block mr-1 text-2xl hover:text-3xl hover:transition duration-500" />
         </Link>
         <Link
-          to="/about"
+          to="/consistency"
           className="px-4 py-2 text-gray-800  hover:text-gray-600"
         >
           <TbCalendar className="inline-block mr-1 text-2xl hover:text-3xl hover:transition duration-500" />

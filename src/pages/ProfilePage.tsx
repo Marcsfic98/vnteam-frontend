@@ -9,7 +9,9 @@ import { AuthContext } from "../contexts/AuthContext";
 function ProfilePage() {
   const { user } = useContext(AuthContext);
 
-  console.log(user);
+  // URL da imagem secundária (caso a principal falhe ou não exista)
+  const fallbackImage =
+    "https://img.magnific.com/vetores-gratis/circulo-azul-com-usuario-branco_78370-4707.jpg?semt=ais_hybrid&w=740&q=80";
 
   return (
     <div className="relative flex flex-col h-full w-full">
@@ -25,18 +27,24 @@ function ProfilePage() {
             src={user.image}
             alt={`Foto de ${user.name}`}
             className="h-32 w-32 rounded-full object-cover object-center border-2 border-blue-500 shadow-md"
+            // 🚀 CORREÇÃO AQUI: Se a imagem do banco falhar ao carregar, coloca a secundária
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = fallbackImage;
+            }}
           />
         ) : (
           <div className="h-32 w-32 rounded-full bg-gray-700 flex items-center justify-center">
-            {/* Ícone ou Inicial do nome caso não tenha imagem */}
             <span className="text-white text-2xl font-bold">
               {user?.name?.charAt(0)}
             </span>
           </div>
         )}
 
-        <h2 className="font-bold text-black">{user?.name}</h2>
-        <p>Plano Anual</p>
+        {/* Exibindo apenas o primeiro nome se desejar manter o padrão da Home */}
+        <h2 className="font-bold text-black mt-2">
+          {user?.name ? user.name.split(" ")[0] : ""}
+        </h2>
+        <p className="text-sm text-gray-500">Plano Anual</p>
       </div>
 
       <div className="w-full flex flex-wrap gap-4 h-60 justify-center mt-8 mx-auto ">
@@ -73,7 +81,7 @@ function ProfilePage() {
         </div>
       </div>
 
-      <button className="text-red-700 font-bold flex justify-center items-center mt-20 gap-2 cursor-pointer">
+      <button className="text-red-700 font-bold flex justify-center items-center mt-20 gap-2 cursor-pointer mx-auto">
         Sair da conta <IoExitOutline />
       </button>
     </div>

@@ -4,11 +4,12 @@ import { useSearchParams } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import type Diet from "../models/dietModule";
 import { search } from "../services/userService";
+import LoadingPage from "./LoadingPage";
 
 export default function DietPage() {
   const [diet, setDiet] = useState<Diet | null>(null);
   const [expandedMeal, setExpandedMeal] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { user } = useContext(AuthContext);
   const currentDiet = user?.diet?.[0];
@@ -18,7 +19,7 @@ export default function DietPage() {
 
   useEffect(() => {
     async function fetchDiet() {
-      setLoading(true);
+      setIsLoading(true);
       try {
         await search(`/diet/${currentDiet?.id}`, setDiet, {
           headers: { Authorization: token },
@@ -26,7 +27,7 @@ export default function DietPage() {
       } catch (error) {
         console.error("Erro ao buscar dieta:", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     }
 
@@ -39,18 +40,17 @@ export default function DietPage() {
     setExpandedMeal(expandedMeal === id ? null : id);
   };
 
-  if (loading || !diet) {
+  if (isLoading || !diet) {
     return (
       <div className="h-screen bg-slate-50 flex items-center justify-center text-slate-800">
-        <p className="animate-pulse text-slate-500 font-medium">
-          Carregando plano alimentar...
-        </p>
+        <LoadingPage />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 pb-24 w-full font-sans selection:bg-blue-200 selection:text-blue-900">
+      {isLoading && <LoadingPage />}
       {/* Header da Dieta com Imagem de Fundo */}
       <div className="relative w-full">
         <img
@@ -61,7 +61,7 @@ export default function DietPage() {
         <div className="bg-[url('/img/bn_diet.png')] bg-cover bg-center w-full h-[30vh] flex rounded-b-4xl justify-between shadow relative">
           {/* Degradê escuro apenas sobre a imagem para garantir que o título branco se mantenha legível */}
           <div className="flex flex-col items-start justify-end h-full pb-4 pl-6 w-full bg-gradient-to-t from-black/70 to-transparent rounded-b-4xl">
-            <button className="bg-blue-600 font-medium text-xs h-6 text-white rounded-full flex items-center px-4 mb-2 shadow-sm">
+            <button className="bg-blue-600 font-medium  h-6 text-white rounded-full flex items-center px-4 mb-2 shadow-sm">
               {currentDiet?.name || diet.name}
             </button>
             <h1 className="text-2xl font-bold text-white">Dieta</h1>

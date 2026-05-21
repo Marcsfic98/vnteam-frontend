@@ -4,6 +4,7 @@ import Navbar from "./components/navbar/Navbar";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import AuthCallback from "./pages/AuthCallback";
+import MonthlyConsistency from "./pages/ConsistencyPage";
 import DietPage from "./pages/DietPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -25,6 +26,7 @@ function App() {
               <Route path="/training_day/:id" element={<TrainingDayPage />} />
               <Route path="/callback" element={<AuthCallback />} />
               <Route path="/diet" element={<DietPage />} />
+              <Route path="/consistency" element={<MonthlyConsistency />} />
             </Routes>
           </div>
           <Navbar />

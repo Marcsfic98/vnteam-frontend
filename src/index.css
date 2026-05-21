@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+@theme {
+  --animate-y-spin-slow: y-spin 3s linear infinite;
+}
+
+@keyframes y-spin {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}

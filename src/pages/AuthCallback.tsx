@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
+import LoadingPage from "./LoadingPage";
 
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
@@ -17,8 +18,8 @@ export default function AuthCallback() {
   }, [searchParams, login, navigate]);
 
   return (
-    <div className="h-screen bg-black flex items-center justify-center text-white font-bold">
-      Autenticando...
+    <div className="h-screen  flex items-center justify-center">
+      <LoadingPage />
     </div>
   );
 }

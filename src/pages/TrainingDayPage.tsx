@@ -6,6 +6,7 @@ import ExerciceBox from "../components/ExerciceBox";
 import { AuthContext } from "../contexts/AuthContext";
 import { type WorkoutDay } from "../models/workoutDaysModule";
 import { search } from "../services/userService";
+import LoadingPage from "./LoadingPage";
 
 function TrainingDayPage() {
   const { user } = useContext(AuthContext);
@@ -36,6 +37,7 @@ function TrainingDayPage() {
 
   return (
     <div className="w-full h-[94vh] flex-col items-center justify-center">
+      {isLoading && <LoadingPage />}
       <div className="flex mx-4 py-5">
         <button
           onClick={() => navigate("/training_plan")}
