@@ -5,7 +5,7 @@ import {
   FiChevronRight,
   FiClock,
   FiPercent,
-} from "react-icons/fi"; // Ícones para os novos cards
+} from "react-icons/fi";
 import SequenceBox from "../components/SequenceBox";
 import { AuthContext } from "../contexts/AuthContext";
 import LoadingPage from "./LoadingPage";
@@ -27,7 +27,7 @@ export default function MonthlyConsistency() {
 
   // 3. Estado que controla qual mês/ano o usuário está visualizando na tela
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = today.toLocaleDateString("sv-SE");
   const [currentDate, setCurrentDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
   );
@@ -47,10 +47,31 @@ export default function MonthlyConsistency() {
     "Dezembro",
   ];
 
-  // Cálculo da sequência (Streak)
+  // LÓGICA DE STREAK
   const calculateStreak = (data: ConsistencyData) => {
     let currentStreak = 0;
     const checkDate = new Date();
+
+    const hjStr = checkDate.toLocaleDateString("sv-SE");
+    const ontem = new Date();
+    ontem.setDate(ontem.getDate() - 1);
+    const ontemStr = ontem.toLocaleDateString("sv-SE");
+
+    const treinouHoje =
+      data[hjStr] === "completed" || data[hjStr] === "started";
+    const treinouOntem =
+      data[ontemStr] === "completed" || data[ontemStr] === "started";
+
+    // Se passou ontem e hoje em branco, zera a sequência
+    if (!treinouHoje && !treinouOntem) {
+      setStreakCount(0);
+      return;
+    }
+
+    // Se não treinou hoje mas treinou ontem, inicia a regressiva a partir de ontem
+    if (!treinouHoje && treinouOntem) {
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
 
     while (true) {
       const dateStr = checkDate.toLocaleDateString("sv-SE");
@@ -110,7 +131,7 @@ export default function MonthlyConsistency() {
     );
   };
 
-  // 6. Matriz de cálculo dos dias do mês atual
+  // 6. Matriz de cálculo dos dias do mês atual corrigida
   const monthDays = useMemo(() => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -127,6 +148,7 @@ export default function MonthlyConsistency() {
 
     for (let day = 1; day <= totalDays; day++) {
       const dateObj = new Date(year, month, day);
+      dateObj.setHours(0, 0, 0, 0); // Evita deslocamento por fuso na mutação de data
       const dateString = dateObj.toLocaleDateString("sv-SE");
 
       const status = sessionsData[dateString] || "not_started";
@@ -138,7 +160,7 @@ export default function MonthlyConsistency() {
     return daysArray;
   }, [currentDate, sessionsData, todayStr]);
 
-  // 7. CÁLCULO DAS MÉTRICAS DINÂMICAS (Treinos Feitos, Taxa % e Tempo)
+  // 7. CÁLCULO DAS MÉTRICAS DINÂMICAS
   const metrics = useMemo(() => {
     const dates = Object.keys(sessionsData).sort();
 
@@ -154,25 +176,19 @@ export default function MonthlyConsistency() {
       if (sessionsData[dateStr] === "started") startedCount++;
     });
 
-    // Treinos feitos: Qualquer um que foi pelo menos inicializado no histórico
     const totalWorkouts = completedCount + startedCount;
 
-    // Taxa de Conclusão: Baseada desde o primeiro dia registrado até hoje
     const firstDate = new Date(dates[0]);
     const nowDate = new Date(todayStr);
 
-    // Diferença em dias entre o primeiro treino e hoje
     const diffTime = Math.abs(nowDate.getTime() - firstDate.getTime());
     const totalDaysElapsed = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-    // Porcentagem de dias concluídos sobre o total de dias que se passaram
     const completionRate = Math.min(
       Math.round((completedCount / totalDaysElapsed) * 100),
       100
     );
 
-    // Tempo Total: Média simulada de 50 minutos por treino finalizado (completed)
-    // convertido em horas e minutos, simulando o comportamento real do banco.
     const totalMinutes = completedCount * 50;
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
@@ -202,8 +218,7 @@ export default function MonthlyConsistency() {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-slate-50/40 p-2 flex flex-col gap-5 min-h-screen pb-10">
-      {/* Container Principal do Calendário */}
+    <div className="w-full max-w-sm mx-auto bg-slate-50/40 p-2 flex flex-col gap-5 min-h-screen pb-10 mb-15">
       <div className="w-full relative bg-white border border-slate-100 rounded-3xl p-5 shadow-sm min-h-[320px] flex flex-col justify-between">
         {isLoading && <LoadingPage />}
 
@@ -214,11 +229,10 @@ export default function MonthlyConsistency() {
         />
 
         <div className="mt-16 mb-8">
-          <SequenceBox count={streakCount} />
+          <SequenceBox count={streakCount} sessionsData={sessionsData} />
         </div>
 
         <div>
-          {/* Cabeçalho de Navegação */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex flex-col">
               <span className="text-xs font-bold tracking-wider uppercase text-slate-400">
@@ -246,7 +260,6 @@ export default function MonthlyConsistency() {
             </div>
           </div>
 
-          {/* Dias da Semana */}
           <div className="grid grid-cols-7 text-center text-[10px] font-bold text-slate-400 uppercase mb-2">
             <span>Dom</span>
             <span>Seg</span>
@@ -257,7 +270,6 @@ export default function MonthlyConsistency() {
             <span>Sáb</span>
           </div>
 
-          {/* Grid de Dias */}
           {error ? (
             <div className="text-center py-8 text-xs text-red-500">{error}</div>
           ) : (
@@ -287,11 +299,8 @@ export default function MonthlyConsistency() {
         </div>
       </div>
 
-      {/* 📊 SEÇÃO DAS TRÊS DIVS DE MÉTRICAS (Idênticas ao design da foto) */}
       <div className="flex flex-col gap-3 w-full">
-        {/* Grid para os dois primeiros cards pequenos */}
         <div className="grid grid-cols-2 gap-3">
-          {/* Card: Treinos Feitos */}
           <div className="bg-blue-50/50 border border-blue-100/40 rounded-2xl p-5 flex flex-col items-center justify-center text-center shadow-sm">
             <div className="p-2 bg-blue-100/60 text-blue-600 rounded-full mb-3">
               <FiCheckCircle size={20} />
@@ -304,7 +313,6 @@ export default function MonthlyConsistency() {
             </p>
           </div>
 
-          {/* Card: Taxa de Conclusão */}
           <div className="bg-blue-50/50 border border-blue-100/40 rounded-2xl p-5 flex flex-col items-center justify-center text-center shadow-sm">
             <div className="p-2 bg-blue-100/60 text-blue-600 rounded-full mb-3">
               <FiPercent size={20} />
@@ -318,7 +326,6 @@ export default function MonthlyConsistency() {
           </div>
         </div>
 
-        {/* Card Largo: Tempo Total */}
         <div className="bg-blue-50/50 border border-blue-100/40 rounded-2xl p-5 flex flex-col items-center justify-center text-center shadow-sm w-full">
           <div className="p-2 bg-blue-100/60 text-blue-600 rounded-full mb-2">
             <FiClock size={20} />

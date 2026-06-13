@@ -8,21 +8,55 @@ interface ConstancyBarProps {
   sessionsData: WeekSessionsData; // Dados vindos do fetch da HomePage
 }
 
+/**
+ * 🚀 FUNÇÃO UTILITÁRIA EXTRA:
+ * Você pode importar esta função no seu componente de Card de Sequência
+ * para garantir que o contador de dias espere até o final do dia de hoje antes de zerar!
+ */
+export function calculateVisualStreak(
+  sessionsData: WeekSessionsData,
+  currentStreakFromBackend: number
+): number {
+  const today = new Date();
+  const todayStr = today.toLocaleDateString("sv-SE"); // 'YYYY-MM-DD'
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toLocaleDateString("sv-SE");
+
+  const statusHoje = sessionsData[todayStr] || "not_started";
+  const statusOntem = sessionsData[yesterdayStr] || "not_started";
+
+  // Se o usuário completou ou iniciou algo hoje ou ontem, mantém a sequência do banco.
+  if (
+    statusHoje === "completed" ||
+    statusHoje === "started" ||
+    statusOntem === "completed" ||
+    statusOntem === "started"
+  ) {
+    return currentStreakFromBackend;
+  }
+
+  // Só zera visualmente se ele passou ontem E hoje sem fazer absolutamente nada
+  return 0;
+}
+
 export default function ConstancyBar({ sessionsData }: ConstancyBarProps) {
   // 1. Dias da semana fixos para as legendas abaixo dos quadradinhos
   const weekDayLabels = ["D", "S", "T", "Q", "Q", "S", "S"];
 
-  // 2. Data de hoje em formato string para a validação da borda
+  // 2. Data de hoje fixa por renderização calculada de forma segura localmente
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = today.toLocaleDateString("sv-SE");
 
-  // 3. Lógica para descobrir as datas exatas da semana atual (de Domingo a Sábado)
+  // 3. Lógica corrigida para descobrir as datas exatas da semana atual
   const currentWeekDays = useMemo(() => {
     const days = [];
     const currentDayOfWeek = today.getDay(); // 0 = Domingo, 1 = Segunda, etc.
 
-    // Encontra o Domingo da semana atual
+    // Encontra o Domingo da semana atual baseado em horários zerados para evitar fuso horário local travando a data
     const sundayDate = new Date(today);
+    sundayDate.setHours(0, 0, 0, 0);
     sundayDate.setDate(today.getDate() - currentDayOfWeek);
 
     // Gera os 7 dias a partir do Domingo encontrado
@@ -43,14 +77,15 @@ export default function ConstancyBar({ sessionsData }: ConstancyBarProps) {
     }
 
     return days;
-  }, [sessionsData, todayStr]);
+    // 🚀 CORREÇÃO: Removemos a dependência mutável de strings de tempo cruas.
+    // O useMemo agora só recalcula se os dados reais de treino mudarem.
+  }, [sessionsData]);
 
   // 4. Retorna as classes de estilização com base no status do treino
   const getStatusClasses = (
     status: "started" | "completed" | "not_started",
     isToday: boolean
   ) => {
-    // Base do seu layout: w-5 h-5 rounded-md (levemente aumentado para encaixar a borda sem espremer)
     const baseClasses = "w-5 h-5 rounded-md transition-all duration-200 border";
 
     // Borda azul destacada se for o dia de hoje
@@ -65,7 +100,6 @@ export default function ConstancyBar({ sessionsData }: ConstancyBarProps) {
         return `${baseClasses} bg-blue-300 border-blue-400 ${todayRing}`; // Azul Claro
       case "not_started":
       default:
-        // Se for hoje e não treinou, ele fica branco com borda cinza (ou a borda azul do hoje)
         return `${baseClasses} bg-white border-slate-300 ${todayRing}`;
     }
   };

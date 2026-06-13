@@ -58,7 +58,7 @@ export default function DietPage() {
           alt="logo"
           className="w-20 absolute top-4 left-4 z-10"
         />
-        <div className="bg-[url('/img/bn_diet.png')] bg-cover bg-center w-full h-[30vh] flex rounded-b-4xl justify-between shadow relative">
+        <div className="bg-[url('/img/bn_diet.webp')] bg-cover bg-center w-full h-[30vh] flex rounded-b-4xl justify-between shadow relative">
           {/* Degradê escuro apenas sobre a imagem para garantir que o título branco se mantenha legível */}
           <div className="flex flex-col items-start justify-end h-full pb-4 pl-6 w-full bg-gradient-to-t from-black/70 to-transparent rounded-b-4xl">
             <button className="bg-blue-600 font-medium  h-6 text-white rounded-full flex items-center px-4 mb-2 shadow-sm">

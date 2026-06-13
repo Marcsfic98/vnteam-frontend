@@ -15,7 +15,7 @@ export default function BoxTraining({
   quantity,
 }: boxTrainingProps) {
   return (
-    <div className="w-full h-50 bg-gray-100 shadow cursor-pointer rounded-lg flex relative bg-[url('/img/superior.png')] bg-cover bg-center  items-center px-4">
+    <div className="w-full h-50 bg-gray-100 shadow cursor-pointer rounded-lg flex relative bg-[url('/img/superior.webp')] bg-cover bg-center  items-center px-4">
       <div className="flex items-center gap-1 text-white  p-2 bg-gray-600 rounded-4xl absolute top-4">
         <TbCalendar />
         <p className="text-xs">{weekDay}</p>

@@ -1,49 +1,63 @@
-import { FaFire } from "react-icons/fa"; // Usando o ícone de fogo para ficar idêntico à imagem
+import { FaFire } from "react-icons/fa";
+
+interface ConsistencyData {
+  [dateString: string]: "started" | "completed" | "not_started";
+}
 
 interface SequenceProps {
   count: number;
+  sessionsData: ConsistencyData; // Adicionado para sincronizar com a virada de dia
 }
 
-export default function SequenceBox({ count }: SequenceProps) {
-  // Função que define as classes de gradiente e sombra com base na quantidade de dias
+export default function SequenceBox({ count, sessionsData }: SequenceProps) {
+  // Validação para manter a cor viva caso ele tenha treinado ontem e o dia acabou de virar
+  const currentTodayStr = new Date().toLocaleDateString("sv-SE");
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toLocaleDateString("sv-SE");
+
+  const treinouHoje =
+    sessionsData[currentTodayStr] === "completed" ||
+    sessionsData[currentTodayStr] === "started";
+  const treinouOntem =
+    sessionsData[yesterdayStr] === "completed" ||
+    sessionsData[yesterdayStr] === "started";
+
+  // Se o banco retornou 0, mas ele treinou ontem e ainda é hoje, segura visualmente o tom ativo
+  const effectiveCount =
+    count === 0 && (treinouHoje || treinouOntem) ? 1 : count;
+
   const getGradientStyles = (days: number) => {
     if (days >= 15) {
-      // Degradê Laranja/Vermelho Escuro (Idêntico ao da foto)
       return "from-amber-500 via-orange-600 to-amber-950 text-white shadow-orange-500/20";
     }
     if (days >= 10) {
-      // Degradê Azul Premium
       return "from-blue-400 via-blue-600 to-indigo-950 text-white shadow-blue-500/20";
     }
     if (days >= 5) {
-      // Degradê Verde Limão/Florestal
       return "from-emerald-400 via-green-600 to-emerald-950 text-white shadow-emerald-500/20";
     }
     if (days > 0) {
-      // Degradê Amarelo/Dourado Energético
       return "from-yellow-400 via-amber-500 to-amber-900 text-white shadow-amber-500/20";
     }
 
-    // Estado Padrão (0 dias ou menor): Cinza Suave Clean (Tema Claro)
     return "from-slate-100 to-slate-200 text-slate-700 shadow-sm border border-slate-200/60";
   };
 
-  const isActive = count > 0;
+  const isActive = effectiveCount > 0;
 
   return (
     <div
       className={`w-full min-h-[160px] bg-gradient-to-br ${getGradientStyles(
-        count
+        effectiveCount
       )} 
         rounded-2xl flex flex-col items-center justify-center p-4 shadow-xl 
         transition-all duration-500 transform hover:scale-[1.02] relative overflow-hidden`}
     >
-      {/* Detalhe sutil de luz de fundo para enfatizar o degradê premium */}
       {isActive && (
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
       )}
 
-      {/* Ícone de Fogo Centralizado dentro do círculo translúcido */}
       <div
         className={`p-3.5 rounded-full flex items-center justify-center mb-2 transition-all duration-300
           ${
@@ -55,7 +69,7 @@ export default function SequenceBox({ count }: SequenceProps) {
         <FaFire
           size={24}
           className={
-            count >= 15
+            effectiveCount >= 15
               ? "text-orange-500 animate-pulse"
               : isActive
               ? "text-white"
@@ -64,7 +78,6 @@ export default function SequenceBox({ count }: SequenceProps) {
         />
       </div>
 
-      {/* Contador de Dias Principal */}
       <h4
         className={`text-3xl font-black tracking-tight leading-none ${
           isActive ? "text-white" : "text-slate-800"
@@ -73,9 +86,8 @@ export default function SequenceBox({ count }: SequenceProps) {
         {count} {count === 1 ? "dia" : "dias"}
       </h4>
 
-      {/* Subtítulo / Legenda inferior */}
       <span
-        className={`text-[11px] font-medium tracking-wide mt-1.5 opacity-80 uppercase tracking-widest
+        className={`text-[11px] font-medium mt-1.5 opacity-80 uppercase tracking-widest
           ${isActive ? "text-white" : "text-slate-500"}`}
       >
         Sequência Atual

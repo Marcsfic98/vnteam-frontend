@@ -1,44 +1,85 @@
 import { BiBowlRice } from "react-icons/bi";
 import { CgLoadbarSound } from "react-icons/cg";
 import { TbCalendar, TbHome, TbUser } from "react-icons/tb";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom"; // Substituído Link por NavLink
 
 function Navbar() {
+  // Classe base comum para manter o alinhamento dos itens idêntico
+  const linkBaseClass =
+    "w-12 h-12 flex justify-center items-center transition-all duration-300 relative mx-2";
+
   return (
     <div>
-      <nav className="w-full bg-gray-100 text-white justify-center items-center h-[6vh] flex fixed bottom-0">
-        <Link
+      <nav className="w-full bg-gray-100 text-white justify-center items-center h-[7vh] flex fixed bottom-0 border-t border-gray-200 z-50">
+        {/* HOME */}
+        <NavLink
           to="/home"
-          className="px-4 py-2 text-gray-800 hover:text-gray-600"
+          className={({ isActive }) =>
+            `${linkBaseClass} ${
+              isActive
+                ? "bg-blue-600 text-white rounded-full shadow-md shadow-blue-500/30 scale-110"
+                : "text-gray-800 hover:text-blue-600"
+            }`
+          }
         >
-          <TbHome className="inline-block mr-1 text-2xl hover:text-3xl hover:transition duration-500" />
-        </Link>
-        <Link
+          <TbHome className="text-2xl" />
+        </NavLink>
+
+        {/* CONSISTÊNCIA */}
+        <NavLink
           to="/consistency"
-          className="px-4 py-2 text-gray-800  hover:text-gray-600"
+          className={({ isActive }) =>
+            `${linkBaseClass} ${
+              isActive
+                ? "bg-blue-600 text-white rounded-full shadow-md shadow-blue-500/30 scale-110"
+                : "text-gray-800 hover:text-blue-600"
+            }`
+          }
         >
-          <TbCalendar className="inline-block mr-1 text-2xl hover:text-3xl hover:transition duration-500" />
-        </Link>
-        <Link
+          <TbCalendar className="text-2xl" />
+        </NavLink>
+
+        {/* TREINO */}
+        <NavLink
           to="/training_plan"
-          className="px-4 py-2 text-gray-800 hover:text-gray-600"
+          className={({ isActive }) =>
+            `${linkBaseClass} ${
+              isActive
+                ? "bg-blue-600 text-white rounded-full shadow-md shadow-blue-500/30 scale-110"
+                : "text-gray-800 hover:text-blue-600"
+            }`
+          }
         >
-          <CgLoadbarSound className="inline-block mr-1 text-2xl hover:text-3xl hover:transition duration-500" />
-        </Link>
+          <CgLoadbarSound className="text-2xl" />
+        </NavLink>
 
-        <Link
+        {/* DIETA */}
+        <NavLink
           to="/diet"
-          className="px-4 py-2 text-gray-800 hover:text-gray-600"
+          className={({ isActive }) =>
+            `${linkBaseClass} ${
+              isActive
+                ? "bg-blue-600 text-white rounded-full shadow-md shadow-blue-500/30 scale-110"
+                : "text-gray-800 hover:text-blue-600"
+            }`
+          }
         >
-          <BiBowlRice className="inline-block w-8 mr-1 text-2xl hover:text-3xl hover:transition duration-500" />
-        </Link>
+          <BiBowlRice className="text-2xl" />
+        </NavLink>
 
-        <Link
+        {/* PERFIL */}
+        <NavLink
           to="/profile"
-          className="px-4 py-2 text-gray-800 hover:text-gray-600"
+          className={({ isActive }) =>
+            `${linkBaseClass} ${
+              isActive
+                ? "bg-blue-600 text-white rounded-full shadow-md shadow-blue-500/30 scale-110"
+                : "text-gray-800 hover:text-blue-600"
+            }`
+          }
         >
-          <TbUser className="inline-block w-8 mr-1 text-2xl hover:text-3xl hover:transition duration-500" />
-        </Link>
+          <TbUser className="text-2xl" />
+        </NavLink>
       </nav>
     </div>
   );

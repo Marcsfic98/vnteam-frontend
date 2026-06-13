@@ -46,13 +46,20 @@ function HomePage() {
     "Sábado",
   ];
 
+  useEffect(() => {
+    if (user) {
+      if (!user.workoutPlans || user.workoutPlans.length === 0) {
+        navigate("/plans", { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
   async function fetchHomeData() {
     if (!user?.id) return;
 
     try {
       setIsLoading(true);
 
-      // 1. Busca treino correspondente ao dia de hoje
       const todayName = daysOfWeek[new Date().getDay()];
       let currentTodayTraining: WorkoutDay | null = null;
 
@@ -62,7 +69,6 @@ function HomePage() {
         setTodayTraining(found || null);
       });
 
-      // 2. Busca o mapa de consistência
       const response = await fetch(
         `http://localhost:3000/user_workout_session/consistency/${user.id}`
       );
@@ -75,7 +81,6 @@ function HomePage() {
         calculateStreak(data);
       }
 
-      // 3. Se iniciado, busca a sessão ativa no banco
       const sessionStatus = currentWeekSessions[todayStr] || "not_started";
       if (sessionStatus === "started") {
         const allSessionsResponse = await fetch(
@@ -96,8 +101,6 @@ function HomePage() {
         }
       }
 
-      // 🚀 AUTOMAÇÃO PARA DIA DE DESCANSO (isRest === true)
-      // Se for dia de descanso e ainda não foi iniciado/computado, executa o ciclo completo
       if (
         currentTodayTraining &&
         (currentTodayTraining as WorkoutDay).isRest === true &&
@@ -112,11 +115,9 @@ function HomePage() {
     }
   }
 
-  // Função auxiliar isolada para disparar o ciclo de Post + Put do descanso sem travar o estado principal
   async function handleAutoRestSession(workoutDayId: number) {
     if (!user?.id) return;
     try {
-      // 1. Cria a sessão de descanso (Inicia)
       const startResponse = await fetch(
         `http://localhost:3000/user_workout_session`,
         {
@@ -133,7 +134,6 @@ function HomePage() {
       if (startResponse.ok) {
         const createdSession: UserWorkoutSession = await startResponse.json();
 
-        // 2. Conclui imediatamente na sequência usando o ID retornado
         if (createdSession.id) {
           await fetch(`http://localhost:3000/user_workout_session`, {
             method: "PUT",
@@ -148,7 +148,6 @@ function HomePage() {
           });
         }
 
-        // 3. Atualiza os quadradinhos e o streak na tela com a nova realidade
         const refreshResponse = await fetch(
           `http://localhost:3000/user_workout_session/consistency/${user.id}`
         );
@@ -170,6 +169,27 @@ function HomePage() {
   const calculateStreak = (data: WeekData) => {
     let currentStreak = 0;
     const checkDate = new Date();
+
+    const hjStr = checkDate.toLocaleDateString("sv-SE");
+    const ontem = new Date();
+    ontem.setDate(ontem.getDate() - 1);
+    const ontemStr = ontem.toLocaleDateString("sv-SE");
+
+    // Se não treinou hoje E não treinou ontem, a sequência realmente quebrou.
+    const treinouHoje =
+      data[hjStr] === "completed" || data[hjStr] === "started";
+    const treinouOntem =
+      data[ontemStr] === "completed" || data[ontemStr] === "started";
+
+    if (!treinouHoje && !treinouOntem) {
+      setStreakCount(0);
+      return;
+    }
+
+    // Se ele não treinou hoje mas treinou ontem
+    if (!treinouHoje && treinouOntem) {
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
 
     while (true) {
       const dateStr = checkDate.toLocaleDateString("sv-SE");
@@ -279,14 +299,12 @@ function HomePage() {
   };
 
   const btnConfig = getButtonConfig();
-
   const showWorkoutCard = todayTraining && todayTraining.isRest === false;
 
   return (
     <div className="w-full min-h-screen bg-slate-50 text-slate-800 pb-24 font-sans selection:bg-blue-200">
-      {/* Banner Superior */}
       {isLoading && <LoadingPage />}
-      <div className="bg-[url('/img/bn_home_2.png')] bg-cover bg-center w-full h-[30vh] flex rounded-b-4xl justify-between shadow relative">
+      <div className="bg-[url('/img/bn_home_2.webp')] bg-cover bg-center w-full h-[30vh] flex rounded-b-4xl justify-between shadow relative">
         <img
           src="/logo/logo.svg"
           alt="logo"
@@ -336,7 +354,7 @@ function HomePage() {
             <ConstancyBar sessionsData={weekSessions} />
           </div>
           <div className="col-span-1">
-            <Sequence count={streakCount} />
+            <Sequence count={streakCount} sessionsData={weekSessions} />
           </div>
         </div>
       </div>
