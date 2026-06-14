@@ -1,3 +1,4 @@
+import type Diet from "./dietModule";
 import type { WorkoutPlan } from "./WorkoutPlanModule";
 
 
@@ -7,5 +8,5 @@ export default interface User {
   email: string;
   image: string; 
   workoutPlans: WorkoutPlan[]; 
-  diet: any[];
+  diet: Diet[];
 }

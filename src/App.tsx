@@ -3,6 +3,7 @@ import "./App.css";
 import Navbar from "./components/navbar/Navbar";
 
 import { AuthProvider } from "./contexts/AuthContext";
+import AdminDashboard from "./pages/AdminDashboard";
 import AuthCallback from "./pages/AuthCallback";
 import BodyComposition from "./pages/BodyComposition";
 import MonthlyConsistency from "./pages/ConsistencyPage";
@@ -13,6 +14,7 @@ import PlansPage from "./pages/PlansPage";
 import ProfilePage from "./pages/ProfilePage";
 import TrainingDayPage from "./pages/TrainingDayPage";
 import TrainingPlanPage from "./pages/TrainingPlanPage";
+import WorkoutBuilder from "./pages/WorkoutBuilder";
 
 function AppContent() {
   const location = useLocation();
@@ -30,10 +32,17 @@ function AppContent() {
         <Route path="/consistency" element={<MonthlyConsistency />} />
         <Route path="/plans" element={<PlansPage />} />
         <Route path="/body_user" element={<BodyComposition />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route
+          path="/admin/workoutbuilder/:alunoId"
+          element={<WorkoutBuilder />}
+        />
       </Routes>
 
       {location.pathname !== "/" &&
         location.pathname !== "/callback" &&
+        location.pathname !== "/admin" &&
+        location.pathname !== "/admin/workoutbuilder/:alunoId" &&
         location.pathname !== "/plans" && <Navbar />}
     </div>
   );
