@@ -11,12 +11,12 @@ import {
   Sparkles,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
-// Importando a sua instância de API e os métodos criados na service
-// (Ajuste o caminho '../services/api' conforme a estrutura de pastas do seu projeto)
-import { workoutService } from "../services/userService";
+// Importando os métodos criados na sua service
+import type User from "../models/userModule.ts";
+import { search, workoutService } from "../services/userService.ts";
 
 // Enum mapeado exatamente igual ao seu backend NestJS
 export enum WeekDay {
@@ -64,7 +64,7 @@ export default function WorkoutBuilder() {
 
   // 1. Captura o :alunoId dinâmico da URL da rota
   const { alunoId } = useParams<{ alunoId: string }>();
-  const idDoAluno = Number(alunoId);
+  const [userData, setUserData] = useState<User>();
 
   // 2. Captura os dados do aluno enviados via state de navegação da tabela
   const location = useLocation();
@@ -72,7 +72,12 @@ export default function WorkoutBuilder() {
   const alunoName = stateData?.nomeAluno || "Aluno";
   const alunoCompleto = stateData?.alunoReal;
 
-  // Estado inicial 100% limpo
+  useEffect(() => {
+    search(`/users/${alunoId}`, setUserData);
+    console.log("Dados do aluno carregados:", userData);
+  }, []);
+
+  // Estado inicial da semana limpo
   const [semana, setSemana] = useState<Record<WeekDay, LocalWorkoutDay>>({
     [WeekDay.SEGUNDA]: {
       name: "",
@@ -198,75 +203,53 @@ export default function WorkoutBuilder() {
     handleUpdateDayProp("exercises", atualizada);
   };
 
-  // Envia a estrutura completa para o banco usando a nova service em inglês
+  // Envia a estrutura de dias para o banco APENAS se o plano existir previamente
   const salvarFichaCompleta = async () => {
-    const planoExistente = alunoCompleto?.workoutPlans?.[0];
-    const workoutPlanId = planoExistente?.id;
+    const workoutPlanId = userData?.workoutPlans?.[0]?.id;
 
-    // Higieniza os valores numéricos impedindo NaNs
-    const garantirNumero = (valor: any): number => {
+    // Regra Rígida: Se o aluno não tiver plano, barra a operação imediatamente no front-end
+    if (!workoutPlanId) {
+      alert(
+        `Não é possível criar treinos: O aluno ${alunoName} não possui nenhum Plano de Treino cadastrado. Atribua um plano a ele antes de montar os treinos semanais.`
+      );
+      console.warn("Operação abortada: Aluno sem workoutPlanId.");
+      return;
+    }
+
+    // Garante o tratamento correto de valores numéricos impedindo strings vazias ou NaNs
+    const garantizarNumero = (valor: any): number => {
       const num = Number(valor);
       return isNaN(num) ? 0 : num;
     };
 
     try {
-      if (workoutPlanId) {
-        // === CENÁRIO A: Aluno já tem Plano. Enviando dias pela service -> createWorkoutDay ===
-        console.log(
-          `Encontrado plano ativo (ID: ${workoutPlanId}). Vinculando dias...`
-        );
+      console.log(
+        `Plano ativo encontrado (ID: ${workoutPlanId}). Vinculando rotinas semanais...`
+      );
 
-        const promises = Object.values(semana).map((dia) => {
-          const payloadDia = {
-            name: dia.name.trim() || `Treino de ${dia.weekDay}`,
-            isRest: dia.isRest,
-            weekDay: dia.weekDay,
-            estimatedDuration: garantirNumero(dia.estimatedDuration),
-            workoutPlanId: workoutPlanId,
-            WorkoutExercice: dia.isRest
-              ? []
-              : dia.exercises.map((ex) => ({
-                  name: ex.name.trim() || "Exercício sem nome",
-                  sets: garantirNumero(ex.sets),
-                  reps: garantirNumero(ex.reps),
-                  restTime: garantirNumero(ex.restTime),
-                  order: garantirNumero(ex.order),
-                })),
-          };
-
-          // Executa usando o método mapeado na service
-          return workoutService.createWorkoutDay(payloadDia);
-        });
-
-        await Promise.all(promises);
-      } else {
-        // === CENÁRIO B: Aluno zerado. Cria o plano macro pela service -> createWorkoutPlan ===
-        console.log("Nenhum plano encontrado. Criando nova estrutura macro...");
-
-        const payloadPlan = {
-          name: "Hipertrofia & Força",
-          isActive: true,
-          userId: idDoAluno,
-          workoutDays: Object.values(semana).map((dia) => ({
-            name: dia.name.trim() || `Treino de ${dia.weekDay}`,
-            isRest: dia.isRest,
-            weekDay: dia.weekDay,
-            estimatedDuration: garantirNumero(dia.estimatedDuration),
-            WorkoutExercice: dia.isRest
-              ? []
-              : dia.exercises.map((ex) => ({
-                  name: ex.name.trim() || "Exercício sem nome",
-                  sets: garantirNumero(ex.sets),
-                  reps: garantirNumero(ex.reps),
-                  restTime: garantirNumero(ex.restTime),
-                  order: garantirNumero(ex.order),
-                })),
-          })),
+      const promises = Object.values(semana).map((dia) => {
+        const payloadDia = {
+          name: dia.name.trim() || `Treino de ${dia.weekDay}`,
+          isRest: dia.isRest,
+          weekDay: dia.weekDay,
+          estimatedDuration: garantizarNumero(dia.estimatedDuration),
+          workoutPlanId: workoutPlanId,
+          WorkoutExercice: dia.isRest
+            ? []
+            : dia.exercises.map((ex) => ({
+                name: ex.name.trim() || "Exercício sem nome",
+                sets: garantizarNumero(ex.sets),
+                reps: garantizarNumero(ex.reps),
+                restTime: garantizarNumero(ex.restTime),
+                order: garantizarNumero(ex.order),
+              })),
         };
 
-        // Executa usando o método mapeado na service
-        await workoutService.createWorkoutPlan(payloadPlan);
-      }
+        // Salva o dia e os exercícios em cascata simples de 1 nível (Day -> Exercise)
+        return workoutService.createWorkoutDay(payloadDia);
+      });
+
+      await Promise.all(promises);
 
       alert(`Rotina de treinos de ${alunoName} salva com sucesso!`);
       navigate("/admin");
@@ -281,7 +264,7 @@ export default function WorkoutBuilder() {
         alert(`Erro de Validação do Servidor: ${txtErro}`);
       } else {
         alert(
-          "Houve um erro técnico ao salvar. Verifique se o servidor NestJS está online na porta 3000."
+          "Houve um erro técnico ao salvar os dias de treino. Certifique-se de que os campos numéricos estão corretos."
         );
       }
     }
@@ -594,10 +577,13 @@ export default function WorkoutBuilder() {
         <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 flex items-start gap-3">
           <Sparkles className="text-blue-600 shrink-0 mt-0.5" size={16} />
           <p className="text-xs text-blue-800 leading-relaxed font-medium">
-            <strong>Modo Inteligente Ativo:</strong> Se o aluno já possuir um
-            plano ativo (como o ID 5 do banco), os novos dias criados serão
-            anexados diretamente a ele, evitando duplicidade e erros relacionais
-            no TypeORM.
+            <strong>Modo Direto Ativo:</strong> Os treinos e exercícios
+            configurados serão injetados de forma segura e direta no plano ativo
+            de ID{" "}
+            <code>
+              {alunoCompleto?.workoutPlans?.[0]?.id || "Não Identificado"}
+            </code>{" "}
+            associado ao aluno.
           </p>
         </div>
       </div>

@@ -61,10 +61,25 @@ function HomePage() {
       setIsLoading(true);
 
       const todayName = daysOfWeek[new Date().getDay()];
+      const currentPlanId = user?.workoutPlans?.[0]?.id; // Captura o ID do plano do usuário logado
       let currentTodayTraining: WorkoutDay | null = null;
 
+      // Se o usuário não tiver plano, nem adianta buscar os dias
+      if (!currentPlanId) {
+        console.warn("Usuário logado não possui um plano de treino ativo.");
+        setTodayTraining(null);
+        return;
+      }
+
       await search("/workout_day", (data: WorkoutDay[]) => {
-        const found = data.find((d) => d.weekDay === todayName);
+        // CORREÇÃO AQUI: Filtra pelo dia da semana E garante que pertence ao plano do usuário
+        const found = data.find(
+          (d) =>
+            d.weekDay === todayName &&
+            (d.workoutPlanId === currentPlanId ||
+              (d.workoutPlan as any)?.id === currentPlanId)
+        );
+
         currentTodayTraining = found || null;
         setTodayTraining(found || null);
       });
