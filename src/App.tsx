@@ -7,6 +7,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AuthCallback from "./pages/AuthCallback";
 import BodyComposition from "./pages/BodyComposition";
 import MonthlyConsistency from "./pages/ConsistencyPage";
+import DietBuilder from "./pages/DietBuilder";
 import DietPage from "./pages/DietPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -18,6 +19,16 @@ import WorkoutBuilder from "./pages/WorkoutBuilder";
 
 function AppContent() {
   const location = useLocation();
+  const path = location.pathname;
+
+  // Validação corrigida usando métodos nativos e Regex para cobrir os parâmetros dinâmicos
+  const hideNavbar =
+    path === "/" ||
+    path === "/callback" ||
+    path === "/admin" ||
+    path === "/plans" ||
+    path.startsWith("/admin/workoutbuilder/") ||
+    path.startsWith("/admin/dietbuilder/");
 
   return (
     <div className="w-full h-full text-gray-800 flex-col items-center justify-center">
@@ -37,13 +48,10 @@ function AppContent() {
           path="/admin/workoutbuilder/:alunoId"
           element={<WorkoutBuilder />}
         />
+        <Route path="/admin/dietbuilder/:id" element={<DietBuilder />} />
       </Routes>
 
-      {location.pathname !== "/" &&
-        location.pathname !== "/callback" &&
-        location.pathname !== "/admin" &&
-        location.pathname !== "/admin/workoutbuilder/:alunoId" &&
-        location.pathname !== "/plans" && <Navbar />}
+      {!hideNavbar && <Navbar />}
     </div>
   );
 }

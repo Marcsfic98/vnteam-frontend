@@ -29,6 +29,25 @@ export const workoutService = {
   }
 };
 
+// --- ADICIONADO: Funções para gerenciamento de dietas ---
+export const dietService = {
+  /**
+   * Remove a dieta antiga pelo ID dela
+   */
+  deleteDiet: async (id: number) => {
+    const res = await api.delete(`/diet/${id}`);
+    return res.data;
+  },
+
+  /**
+   * Cria uma nova dieta com as refeições e alimentos em efeito cascata (Cascade)
+   */
+  createDiet: async (payload: object) => {
+    const res = await api.post("/diet", payload);
+    return res.data;
+  }
+};
+
 export const search = async (
   url: string,
   setDados: Function,
