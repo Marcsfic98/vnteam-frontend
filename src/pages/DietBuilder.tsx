@@ -258,7 +258,7 @@ export default function DietBuilder() {
           user?.name || alunoName
         } salvo com sucesso.`
       );
-      navigate(-1);
+      navigate("/admin");
     } catch (error) {
       console.error("Erro no fluxo de salvamento:", error);
       alert("Houve um problema técnico ao processar a substituição da dieta.");

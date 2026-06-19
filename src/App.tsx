@@ -15,6 +15,7 @@ import PlansPage from "./pages/PlansPage";
 import ProfilePage from "./pages/ProfilePage";
 import TrainingDayPage from "./pages/TrainingDayPage";
 import TrainingPlanPage from "./pages/TrainingPlanPage";
+import UserProfileDetails from "./pages/UserProfileDetails";
 import WorkoutBuilder from "./pages/WorkoutBuilder";
 
 function AppContent() {
@@ -28,7 +29,8 @@ function AppContent() {
     path === "/admin" ||
     path === "/plans" ||
     path.startsWith("/admin/workoutbuilder/") ||
-    path.startsWith("/admin/dietbuilder/");
+    path.startsWith("/admin/dietbuilder/") ||
+    path.startsWith("/admin/user/");
 
   return (
     <div className="w-full h-full text-gray-800 flex-col items-center justify-center">
@@ -49,6 +51,7 @@ function AppContent() {
           element={<WorkoutBuilder />}
         />
         <Route path="/admin/dietbuilder/:id" element={<DietBuilder />} />
+        <Route path="/admin/user/:id" element={<UserProfileDetails />} />
       </Routes>
 
       {!hideNavbar && <Navbar />}

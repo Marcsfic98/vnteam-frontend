@@ -252,7 +252,7 @@ export default function WorkoutBuilder() {
       await Promise.all(promises);
 
       alert(`Rotina de treinos de ${alunoName} salva com sucesso!`);
-      navigate("/admin");
+      navigate(`/admin/dietbuilder/${alunoId}`);
     } catch (error: any) {
       console.error("Erro detalhado retornado pelo NestJS:", error);
 

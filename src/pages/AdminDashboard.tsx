@@ -377,6 +377,21 @@ export default function AdminDashboard() {
                       </td>
 
                       {/* Botão de Ação contextualizado */}
+
+                      <td className="p-4 text-right">
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/user/${aluno.id}`, {
+                              state: { nomeAluno: aluno.name },
+                            })
+                          }
+                          className="px-2.5 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl transition inline-flex items-center gap-1 text-xs font-bold shadow-sm"
+                        >
+                          Perfil{" "}
+                          <ArrowUpRight size={14} className="text-blue-600" />
+                        </button>
+                      </td>
+
                       <td className="p-4 text-right">
                         <button
                           onClick={() =>
