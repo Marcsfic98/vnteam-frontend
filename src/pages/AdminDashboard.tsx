@@ -30,10 +30,13 @@ export default function AdminDashboard() {
 
   // --- REGRAS DE NEGÓCIO E MÉTRICAS ---
 
-  const qtdTotal = users.length;
+  // Filtra a lista principal para garantir que administradores não sejam listados como alunos
+  const apenasAlunos = users.filter((u) => u.role !== "admin");
+
+  const qtdTotal = apenasAlunos.length;
 
   // Um usuário é considerado ativo se possuir algum plano de matrícula ativo (isActive === true)
-  const qtdAtivos = users.filter(
+  const qtdAtivos = apenasAlunos.filter(
     (u) =>
       u.workoutPlans &&
       u.workoutPlans.some(
@@ -42,7 +45,7 @@ export default function AdminDashboard() {
   ).length;
 
   // Regra Atualizada: Só conta como Pendente se o usuário tiver Plano Ativo E nenhuma ficha/treino cadastrado
-  const qtdPendentes = users.filter((u) => {
+  const qtdPendentes = apenasAlunos.filter((u) => {
     const temPlanoAtivo =
       u.workoutPlans &&
       u.workoutPlans.some(
@@ -56,8 +59,8 @@ export default function AdminDashboard() {
   const percentualAtivos =
     qtdTotal > 0 ? Math.round((qtdAtivos / qtdTotal) * 100) : 0;
 
-  // 1. Filtro por Aba da Sidebar
-  const alunosPorAba = users.filter((aluno) => {
+  // 1. Filtro por Aba da Sidebar (rodando em cima da lista limpa de alunos)
+  const alunosPorAba = apenasAlunos.filter((aluno) => {
     const temPlanoAtivo =
       aluno.workoutPlans &&
       aluno.workoutPlans.some(
@@ -205,7 +208,7 @@ export default function AdminDashboard() {
           </nav>
         </div>
 
-        {/* Rodapé da Sidebar - Dados fixos do Administrador */}
+        {/* Rodapé da Sidebar - Dados do Administrador */}
         <div className="border-t border-slate-100 pt-4 flex items-center gap-3 px-2">
           <div className="h-9 w-9 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-700 text-xs">
             AD
@@ -345,7 +348,7 @@ export default function AdminDashboard() {
                         {aluno.workoutPlans?.length || 0} ficha(s)
                       </td>
 
-                      {/* Tag de Pendência Dinâmica baseada nas regras de Plano Ativo */}
+                      {/* Tag de Pendência Dinâmica */}
                       <td className="p-4">
                         {!possuiPlanos ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/60 animate-pulse">
@@ -376,9 +379,8 @@ export default function AdminDashboard() {
                         </span>
                       </td>
 
-                      {/* Botão de Ação contextualizado */}
-
-                      <td className="p-4 text-right">
+                      {/* Botões de Ação */}
+                      <td className="p-4 text-right space-x-2">
                         <button
                           onClick={() =>
                             navigate(`/admin/user/${aluno.id}`, {
@@ -390,9 +392,7 @@ export default function AdminDashboard() {
                           Perfil{" "}
                           <ArrowUpRight size={14} className="text-blue-600" />
                         </button>
-                      </td>
 
-                      <td className="p-4 text-right">
                         <button
                           onClick={() =>
                             navigate(`/admin/workoutbuilder/${aluno.id}`, {

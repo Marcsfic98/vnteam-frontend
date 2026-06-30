@@ -5,7 +5,6 @@ import {
   MoveUp,
   Plus,
   Save,
-  Sparkles,
   Trash2,
   Utensils,
 } from "lucide-react";
@@ -497,15 +496,6 @@ export default function DietBuilder() {
               </p>
             </div>
           )}
-        </div>
-
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 mt-6">
-          <Sparkles className="text-amber-600 shrink-0 mt-0.5" size={16} />
-          <p className="text-xs text-amber-800 leading-relaxed font-medium">
-            <strong>Regra de Overwrite Ativa:</strong> A service executa o fluxo
-            combinado limpando instâncias antigas por meio do objeto modular
-            customizado <code>dietService</code>.
-          </p>
         </div>
       </div>
     </div>

@@ -48,6 +48,11 @@ function HomePage() {
 
   useEffect(() => {
     if (user) {
+      if (user.role === "admin") {
+        navigate("/admin");
+        return;
+      }
+
       if (!user.workoutPlans || user.workoutPlans.length === 0) {
         navigate("/plans", { replace: true });
       }

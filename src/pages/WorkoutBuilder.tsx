@@ -562,7 +562,7 @@ export default function WorkoutBuilder() {
                   <div className="text-center py-16 px-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center">
                     <FolderPlus className="text-slate-300 mb-2" size={32} />
                     <h4 className="font-bold text-slate-700 text-sm">
-                      Monte o treino para esta {diaSelecionado.toLowerCase()}
+                      Monte o treino para {diaSelecionado.toLowerCase()}
                     </h4>
                     <p className="text-slate-400 text-xs mt-0.5">
                       Adicione os exercícios clicando no botão acima.
@@ -577,13 +577,12 @@ export default function WorkoutBuilder() {
         <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 flex items-start gap-3">
           <Sparkles className="text-blue-600 shrink-0 mt-0.5" size={16} />
           <p className="text-xs text-blue-800 leading-relaxed font-medium">
-            <strong>Modo Direto Ativo:</strong> Os treinos e exercícios
-            configurados serão injetados de forma segura e direta no plano ativo
-            de ID{" "}
-            <code>
-              {alunoCompleto?.workoutPlans?.[0]?.id || "Não Identificado"}
-            </code>{" "}
-            associado ao aluno.
+            Os pequenos círculos abaixo dos nomes dos dias no topo indicam o
+            status: <span className="text-slate-400 font-bold">Cinza</span> para
+            dias vazios, <span className="text-blue-600 font-bold">Azul</span>{" "}
+            para dias com treinos iniciados e{" "}
+            <span className="text-amber-600 font-bold">Laranja</span> para dias
+            definidos como descanso.
           </p>
         </div>
       </div>
